@@ -1,4 +1,6 @@
 {
+  "_status": "PROVISIONAL_PLACEHOLDER_DO_NOT_QUOTE",
+  "_warning": "Isotonic regression fit on 4 validation points from synthetic circular labels. ECE=0 and Brier=0 are artifacts of step-function memorization on degenerate data. Re-fit prior to Phase 17 evaluation.",
   "method": "isotonic",
   "is_fit": true,
   "platt_a": 1.0,

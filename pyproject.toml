@@ -52,7 +52,13 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*", "api*"]
+include = ["src*", "api*", "database*"]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+extraPaths = [".", "src"]
+include = ["src", "api", "database", "tests"]
 
 [tool.black]
 line-length = 88

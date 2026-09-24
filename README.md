@@ -1,6 +1,6 @@
-# AI-Powered Skill-Aware Semantic Job Search and Personalized Recommendation System
+# ResumeIQ — AI-Powered Skill-Aware Semantic Job Search and Personalized Recommendation System
 
-[![CI](https://github.com/organization/ai-job-recommendation-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/organization/ai-job-recommendation-engine/actions)
+[![CI](https://github.com/avikengineer007/ResumeIQ-AI_Job_Recommendation_Engine/actions/workflows/ci.yml/badge.svg)](https://github.com/avikengineer007/ResumeIQ-AI_Job_Recommendation_Engine/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -35,7 +35,7 @@ A reproducible, research-grade, and production-ready job recommendation platform
 ## Directory Structure
 
 ```
-ai-job-recommendation-engine/
+ResumeIQ-AI_Job_Recommendation_Engine/
 ├── .github/workflows/ci.yml      # Continuous integration (Ruff, Black, Pytest)
 ├── configs/                      # Central YAML configurations (no hardcoding)
 ├── data/                         # Data tier (raw, interim, processed, evaluation)
@@ -74,8 +74,8 @@ ai-job-recommendation-engine/
 ### 1. Environment Setup
 ```bash
 # Clone the repository
-git clone https://github.com/organization/ai-job-recommendation-engine.git
-cd ai-job-recommendation-engine
+git clone https://github.com/avikengineer007/ResumeIQ-AI_Job_Recommendation_Engine.git
+cd ResumeIQ-AI_Job_Recommendation_Engine
 
 # Copy configuration template
 cp .env.example .env
@@ -110,3 +110,14 @@ pytest tests/unit
 - **Leakage Prevention**: All judged resume-job pairs reside in the same split as the candidate resume.
 - **Zero Fabrication**: All results tables are marked TBD until populated by real reproducible benchmark runs.
 - **Privacy First**: Sensitive attributes (gender, age, ethnicity, photo, religion) are strictly prohibited from extraction and recommendation logic.
+
+> [!WARNING]
+> ### Methodological Advisory: Provisional Status of Phase 10 Tuning & Calibration
+> Artifacts in `configs/tuned_hyperparameters.json` and `models/calibrator.json` are **provisional placeholders** generated for pipeline integration testing and must **NOT** be reported or interpreted as empirical results:
+> 1. **Evaluation Leakage & Circularity**: The initial synthetic qrels (`data/evaluation/qrels_val.json`) derived relevance labels directly via deterministic skill overlap, mechanically aligning with the scoring pipeline's skill features.
+> 2. **Sample Size Deficit**: The initial validation split contains only 5 candidate resumes, leading to a degenerate optimization landscape where heuristic default weights were returned unchanged, and isotonic regression memorized the 4 prediction points (yielding artificial Brier = 0.0000 and ECE = 0.0000).
+> 3. **Prerequisites Prior to Phase 17 Evaluation**:
+>    - Scale validation split to at least 50–100 annotated queries.
+>    - Generate ground-truth qrels completely independent of the retrieval pipeline via candidate pooling and blind multi-annotator assessment (per Section 8.3 protocol).
+>    - Re-run joint hyperparameter optimization and probability calibration against the independent labels.
+

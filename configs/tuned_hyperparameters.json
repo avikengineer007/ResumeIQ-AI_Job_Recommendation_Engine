@@ -1,4 +1,6 @@
 {
+  "_status": "PROVISIONAL_PLACEHOLDER_DO_NOT_QUOTE",
+  "_warning": "Metrics were computed on an unannotated 5-resume validation split with synthetic circular qrels. Do NOT quote as empirical results. Re-tune prior to Phase 17 evaluation.",
   "rrf_k": 40,
   "fusion_weights": {
     "bm25": 0.35,

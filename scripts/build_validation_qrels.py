@@ -1,11 +1,12 @@
 """Generate initial validation benchmark relevance labels (qrels_val.json).
 
-Builds graded relevance ground truth across validation split resumes and job postings
-using deterministic skill overlap and role criteria:
-- Score 3.0: High skill match (>= 60%) and matching domain/role
-- Score 2.0: Moderate skill match (>= 40%)
-- Score 1.0: Partial skill match (>= 20%)
-- Score 0.0: Irrelevant (< 20%)
+PROVISIONAL / PLACEHOLDER SCRIPT:
+Note: This script generates synthetic qrels via deterministic Jaccard skill overlap.
+Because the downstream ranking pipeline also heavily weights skill overlap, using these
+labels creates circular evaluation leakage (mechanically yielding near-perfect NDCG/MRR).
+TODO(Phase 17): Replace these synthetic labels with real multi-annotator judgements
+collected via pooling + blind annotation across an expanded validation set (50-100 resumes)
+before running formal research benchmarks.
 """
 
 import json

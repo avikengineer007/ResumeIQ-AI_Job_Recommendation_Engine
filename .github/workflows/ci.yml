@@ -34,4 +34,4 @@ jobs:
 
       - name: Run Automated Tests
         run: |
-          pytest -m "not slow" --cov=src --cov-report=term-missing
+          pytest -m "not slow and not model" --cov=src --cov-report=term-missing

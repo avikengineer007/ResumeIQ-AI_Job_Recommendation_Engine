@@ -1,10 +1,13 @@
-"""Orchestration script for Phase 10 validation-split tuning & calibration.
+"""Orchestration script for validation-split tuning & calibration.
 
-Executes joint optimization across:
-- Retrieval fusion weights (BM25, vector, skill) & RRF k
-- Experience decay lambda & personalization weights
-- Fits and serializes probability calibrator (safe JSON) on validation predictions
-- Saves tuned parameters to configs/tuned_hyperparameters.json
+PROVISIONAL STATUS:
+The outputs of this tuning run (configs/tuned_hyperparameters.json, models/calibrator.json)
+are integration placeholders. Because current validation qrels are synthetically derived
+from skill overlap and the validation set has only 5 resumes, the resulting metrics
+(NDCG 0.986, MRR 1.0, Brier 0.0, ECE 0.0) are artifacts of label leakage and step-function
+memorization.
+TODO(Phase 17): Re-run tuning and calibration against the expanded, independently annotated
+benchmark set before citing any experimental numbers.
 """
 
 import json
