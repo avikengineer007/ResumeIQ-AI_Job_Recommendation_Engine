@@ -1,0 +1,46 @@
+{
+  "seed": 42,
+  "created_at": "2026-09-24T15:34:34.224799+00:00",
+  "ratios": {
+    "train": 0.6,
+    "val": 0.2,
+    "test": 0.2
+  },
+  "train_resume_ids": [
+    "res_0017",
+    "res_0013",
+    "res_0010",
+    "res_0020",
+    "res_0019",
+    "res_0007",
+    "res_0006",
+    "res_0011",
+    "res_0016",
+    "res_0022",
+    "res_0012",
+    "res_0018",
+    "res_0002",
+    "res_0015",
+    "res_0023"
+  ],
+  "val_resume_ids": [
+    "res_0014",
+    "res_0003",
+    "res_0024",
+    "res_0005",
+    "res_0025"
+  ],
+  "test_resume_ids": [
+    "res_0008",
+    "res_0009",
+    "res_0001",
+    "res_0004",
+    "res_0021"
+  ],
+  "stats": {
+    "total_resumes": 25,
+    "train_count": 15,
+    "val_count": 5,
+    "test_count": 5
+  }
+}
