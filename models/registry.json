@@ -1,0 +1,44 @@
+{
+  "embeddings": {
+    "sentence-transformers/all-MiniLM-L6-v2": {
+      "dimension": 384,
+      "max_seq_length": 256,
+      "revision": "main",
+      "metric": "cosine",
+      "notes": "Fast baseline model"
+    },
+    "sentence-transformers/all-mpnet-base-v2": {
+      "dimension": 768,
+      "max_seq_length": 384,
+      "revision": "main",
+      "metric": "cosine",
+      "notes": "High performance general purpose sentence embedding"
+    },
+    "BAAI/bge-base-en-v1.5": {
+      "dimension": 768,
+      "max_seq_length": 512,
+      "revision": "main",
+      "metric": "cosine",
+      "notes": "State-of-the-art dense retrieval model"
+    },
+    "intfloat/e5-base-v2": {
+      "dimension": 768,
+      "max_seq_length": 512,
+      "revision": "main",
+      "metric": "cosine",
+      "notes": "Asymmetric retrieval model requiring query/passage prefixes"
+    }
+  },
+  "rerankers": {
+    "cross-encoder/ms-marco-MiniLM-L-6-v2": {
+      "max_length": 512,
+      "revision": "main",
+      "notes": "Standard cross-encoder for second stage reranking"
+    },
+    "BAAI/bge-reranker-base": {
+      "max_length": 512,
+      "revision": "main",
+      "notes": "BGE cross-encoder reranker"
+    }
+  }
+}

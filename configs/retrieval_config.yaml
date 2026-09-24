@@ -1,0 +1,45 @@
+# Search, Retrieval and Ranking Hyperparameters
+
+bm25:
+  k1: 1.5
+  b: 0.75
+  title_boost: 2.0
+  skills_boost: 1.5
+  description_boost: 1.0
+
+vector_search:
+  index_type: "IndexFlatIP" # exact cosine similarity for evaluation
+  hnsw_m: 32
+  hnsw_ef_construction: 200
+  hnsw_ef_search: 64
+
+fusion:
+  default_mode: "rrf" # "rrf" or "weighted"
+  rrf_k: 60
+  weighted_weights:
+    bm25: 0.35
+    vector: 0.45
+    skill: 0.20
+
+skill_matching:
+  exact_weight: 1.0
+  parent_discount: 0.60
+  related_discount: 0.40
+  fuzzy_threshold: 92.0
+  embedding_similarity_threshold: 0.82
+
+reranking:
+  top_n: 50
+  top_k: 10
+
+personalization:
+  weights:
+    s_rerank: 0.35
+    s_sem: 0.20
+    s_skill: 0.25
+    s_exp: 0.10
+    s_role: 0.05
+    s_loc: 0.025
+    s_mode: 0.025
+    s_pref: 0.0
+    s_inter: 0.0

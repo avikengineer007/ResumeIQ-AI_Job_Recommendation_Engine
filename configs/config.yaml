@@ -1,0 +1,38 @@
+# Main Application & Pipeline Configuration
+# Golden Rule: No hard-coded paths, seeds, model names, or thresholds.
+
+system:
+  seed: 42
+  app_name: "ai-job-recommendation-engine"
+  environment: "development"
+  debug: true
+
+paths:
+  data_raw: "data/raw"
+  data_interim: "data/interim"
+  data_processed: "data/processed"
+  data_evaluation: "data/evaluation"
+  models_dir: "models"
+  configs_dir: "configs"
+  experiments_dir: "experiments"
+  splits_file: "data/processed/splits.json"
+
+dataset:
+  train_ratio: 0.60
+  val_ratio: 0.20
+  test_ratio: 0.20
+  random_state: 42
+  group_by: "resume_id"
+
+pii:
+  mask_names: true
+  mask_emails: true
+  mask_phones: true
+  mask_addresses: true
+  mask_urls: true
+  replacement_strategy: "typed_placeholder" # e.g. [EMAIL], [PHONE], [NAME]
+
+database:
+  echo_sql: false
+  pool_size: 10
+  max_overflow: 20

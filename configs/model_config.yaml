@@ -1,0 +1,46 @@
+# Embedding, Reranking and NLP Model Configurations
+# All model references and revisions must be explicitly tracked.
+
+embeddings:
+  default_model: "sentence-transformers/all-MiniLM-L6-v2"
+  normalize: true
+  batch_size: 64
+  candidates:
+    - name: "sentence-transformers/all-MiniLM-L6-v2"
+      dimension: 384
+      max_seq_length: 256
+      revision: "main"
+      prefix_query: ""
+      prefix_passage: ""
+    - name: "sentence-transformers/all-mpnet-base-v2"
+      dimension: 768
+      max_seq_length: 384
+      revision: "main"
+      prefix_query: ""
+      prefix_passage: ""
+    - name: "BAAI/bge-base-en-v1.5"
+      dimension: 768
+      max_seq_length: 512
+      revision: "main"
+      prefix_query: "Represent this sentence for searching relevant passages: "
+      prefix_passage: ""
+    - name: "intfloat/e5-base-v2"
+      dimension: 768
+      max_seq_length: 512
+      revision: "main"
+      prefix_query: "query: "
+      prefix_passage: "passage: "
+
+rerankers:
+  default_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  max_length: 512
+  batch_size: 32
+  candidates:
+    - name: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+      revision: "main"
+    - name: "BAAI/bge-reranker-base"
+      revision: "main"
+
+spacy:
+  model_name: "en_core_web_sm"
+  ner_labels: ["SKILL", "DEGREE", "EXPERIENCE", "ORGANIZATION"]

@@ -1,0 +1,36 @@
+# Structured JSON Logging Configuration
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  json:
+    (): src.common.logging_utils.JSONFormatter
+    sensitive_keys:
+      - "password"
+      - "token"
+      - "jwt_secret"
+      - "authorization"
+      - "resume_text"
+      - "email"
+      - "phone"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: json
+    stream: ext://sys.stdout
+
+root:
+  level: INFO
+  handlers: [console]
+
+loggers:
+  src:
+    level: DEBUG
+    handlers: [console]
+    propagate: false
+  api:
+    level: DEBUG
+    handlers: [console]
+    propagate: false
