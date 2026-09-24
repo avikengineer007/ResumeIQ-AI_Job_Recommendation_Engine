@@ -1,0 +1,23 @@
+{
+  "rrf_k": 40,
+  "fusion_weights": {
+    "bm25": 0.35,
+    "vector": 0.45,
+    "skill": 0.2
+  },
+  "lambda_exp": 0.25,
+  "personalization_weights": {
+    "s_rerank": 0.35,
+    "s_sem": 0.2,
+    "s_skill": 0.25,
+    "s_exp": 0.1,
+    "s_role": 0.05,
+    "s_loc": 0.025,
+    "s_mode": 0.025
+  },
+  "best_ndcg_at_10": 0.9861494662280881,
+  "best_mrr": 1.0,
+  "calibrator_method": "isotonic",
+  "calibrator_brier": 0.0,
+  "calibrator_ece": 0.0
+}

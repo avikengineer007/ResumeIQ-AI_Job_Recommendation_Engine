@@ -156,9 +156,9 @@ class HybridSearchEngine:
         mode: str = "rrf",
     ) -> list[HybridSearchResult]:
         """Perform hybrid search over indexed corpus with specified fusion mode ('rrf' or 'weighted')."""
-        if mode not in ("rrf", "weighted"):
+        if mode not in ("rrf", "weighted", "linear"):
             raise ValueError(
-                f"Unsupported fusion mode: {mode}. Must be 'rrf' or 'weighted'"
+                f"Unsupported fusion mode: {mode}. Must be 'rrf', 'weighted', or 'linear'"
             )
 
         # 1. Retrieve BM25 candidates
@@ -182,10 +182,15 @@ class HybridSearchEngine:
         skill_scores: dict[str, float] = {}
         all_candidate_ids = set(bm25_scores.keys()).union(vector_scores.keys())
 
-        if candidate_skill_ids and self.skill_matcher and self.job_skills_lookup:
+        if (
+            candidate_skill_ids is not None
+            and len(candidate_skill_ids) > 0
+            and self.skill_matcher
+            and self.job_skills_lookup
+        ):
             for doc_id in all_candidate_ids:
                 job_reqs = self.job_skills_lookup.get(doc_id, [])
-                if job_reqs:
+                if job_reqs is not None and len(job_reqs) > 0:
                     match_res = self.skill_matcher.match(candidate_skill_ids, job_reqs)
                     skill_scores[doc_id] = match_res.skill_score
 

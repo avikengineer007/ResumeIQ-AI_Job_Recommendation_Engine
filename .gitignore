@@ -58,6 +58,7 @@ data/processed/embeddings/*
 models/*
 !models/MODEL_CARD.md
 !models/registry.json
+!models/calibrator.json
 !models/.gitkeep
 
 # MLflow & Experiment Tracking

@@ -15,8 +15,7 @@ vector_search:
 
 fusion:
   default_mode: "rrf" # "rrf" or "weighted"
-  rrf_k: 60
-  # TODO(Phase 10): tune on validation split (currently heuristic defaults)
+  rrf_k: 40 # Tuned on validation split (Phase 10)
   weighted_weights:
     bm25: 0.35
     vector: 0.45
@@ -34,6 +33,7 @@ reranking:
   top_k: 10
 
 personalization:
+  exp_decay_lambda: 0.25 # Tuned on validation split (Phase 10)
   weights:
     s_rerank: 0.35
     s_sem: 0.20

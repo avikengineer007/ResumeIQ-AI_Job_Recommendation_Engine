@@ -4,10 +4,11 @@ PROTOCOL RULES & LEAKAGE PREVENTION:
 1. Calibration models (Platt scaling and Isotonic regression) must be fit
    EXCLUSIVELY on the validation split.
 2. Never fit calibrators on the test split.
-3. Once fit on validation data, serialize the calibrator and load it for inference.
+3. Once fit on validation data, serialize the calibrator parameters to safe JSON
+   and load it for test-set inference or serving.
 """
 
-import pickle
+import json
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -54,7 +55,9 @@ def expected_calibration_error(
 class ScoreCalibrator:
     """Calibrates raw ranking scores into true empirical probabilities using Platt or Isotonic scaling.
 
-    NOTE: Must be fit strictly on validation split data and serialized before test-set evaluation.
+    Uses safe JSON serialization for fitted parameters (coefficients for Platt, thresholds for Isotonic)
+    to eliminate any untrusted pickle deserialization risks.
+    NOTE: Must be fit strictly on validation split data.
     """
 
     def __init__(self, method: str = "platt") -> None:
@@ -63,31 +66,33 @@ class ScoreCalibrator:
         self.method = method
         self.is_fit = False
 
-        if self.method == "platt":
-            self.model: LogisticRegression | IsotonicRegression = LogisticRegression(
-                solver="lbfgs"
-            )
-        else:
-            self.model = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
+        # Platt parameters
+        self.platt_a: float = 1.0
+        self.platt_b: float = 0.0
+
+        # Isotonic parameters
+        self.iso_x: list[float] = []
+        self.iso_y: list[float] = []
 
     def fit(
         self,
         raw_scores: Sequence[float] | np.ndarray,
         labels: Sequence[int] | np.ndarray,
     ) -> "ScoreCalibrator":
-        """Fit calibration model on validation scores and binary relevance labels.
-
-        Args:
-            raw_scores: Raw model scores from cross-encoder or hybrid search
-            labels: Binary relevance indicators (1 for relevant/applied, 0 otherwise)
-        """
+        """Fit calibration model on validation scores and binary relevance labels."""
         x = np.asarray(raw_scores, dtype=np.float64).reshape(-1, 1)
         y = np.asarray(labels, dtype=np.int32)
 
         if self.method == "platt":
-            self.model.fit(x, y)
+            lr = LogisticRegression(solver="lbfgs")
+            lr.fit(x, y)
+            self.platt_a = float(lr.coef_[0][0])
+            self.platt_b = float(lr.intercept_[0])
         else:
-            self.model.fit(x.ravel(), y)
+            iso = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
+            iso.fit(x.ravel(), y)
+            self.iso_x = [float(v) for v in iso.X_thresholds_]
+            self.iso_y = [float(v) for v in iso.y_thresholds_]
 
         self.is_fit = True
         return self
@@ -101,15 +106,26 @@ class ScoreCalibrator:
 
         x = np.asarray(raw_scores, dtype=np.float64)
         if self.method == "platt":
-            x_2d = x.reshape(-1, 1)
-            probs = self.model.predict_proba(x_2d)[:, 1]
+            logits = self.platt_a * x + self.platt_b
+            # Numerically stable sigmoid
+            probs = np.where(
+                logits >= 0,
+                1.0 / (1.0 + np.exp(-logits)),
+                np.exp(logits) / (1.0 + np.exp(logits)),
+            )
         else:
-            probs = self.model.predict(x.ravel())
+            probs = np.interp(
+                x,
+                self.iso_x,
+                self.iso_y,
+                left=self.iso_y[0] if self.iso_y else 0.0,
+                right=self.iso_y[-1] if self.iso_y else 1.0,
+            )
 
         return np.clip(probs, 0.0, 1.0).astype(np.float64)
 
     def save(self, output_path: str | Path) -> None:
-        """Persist calibrator state to file using pickle."""
+        """Persist calibrator state to plain, safe JSON file."""
         p = Path(output_path)
         p.parent.mkdir(parents=True, exist_ok=True)
 
@@ -119,20 +135,26 @@ class ScoreCalibrator:
         state = {
             "method": self.method,
             "is_fit": self.is_fit,
-            "model": self.model,
+            "platt_a": self.platt_a,
+            "platt_b": self.platt_b,
+            "iso_x": self.iso_x,
+            "iso_y": self.iso_y,
         }
 
-        with open(p, "wb") as f:
-            pickle.dump(state, f)
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(state, f, indent=2)
 
     @classmethod
     def load(cls, input_path: str | Path) -> "ScoreCalibrator":
-        """Load calibrator state from file."""
-        with open(input_path, "rb") as f:
-            state = pickle.load(f)
+        """Load calibrator state from plain JSON file."""
+        with open(input_path, encoding="utf-8") as f:
+            state = json.load(f)
 
         calibrator = cls(method=state["method"])
         calibrator.is_fit = state["is_fit"]
-        calibrator.model = state["model"]
+        calibrator.platt_a = state.get("platt_a", 1.0)
+        calibrator.platt_b = state.get("platt_b", 0.0)
+        calibrator.iso_x = state.get("iso_x", [])
+        calibrator.iso_y = state.get("iso_y", [])
 
         return calibrator

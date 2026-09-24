@@ -28,6 +28,32 @@ class CandidatePreferences:
     require_location: bool = False
     require_work_mode: bool = False
 
+    def __post_init__(self) -> None:
+        if hasattr(self.candidate_skills, "tolist"):
+            self.candidate_skills = self.candidate_skills.tolist()
+        elif not isinstance(self.candidate_skills, list):
+            self.candidate_skills = (
+                list(self.candidate_skills) if self.candidate_skills is not None else []
+            )
+
+        if hasattr(self.preferred_locations, "tolist"):
+            self.preferred_locations = self.preferred_locations.tolist()
+        elif not isinstance(self.preferred_locations, list):
+            self.preferred_locations = (
+                list(self.preferred_locations)
+                if self.preferred_locations is not None
+                else []
+            )
+
+        if hasattr(self.preferred_work_modes, "tolist"):
+            self.preferred_work_modes = self.preferred_work_modes.tolist()
+        elif not isinstance(self.preferred_work_modes, list):
+            self.preferred_work_modes = (
+                list(self.preferred_work_modes)
+                if self.preferred_work_modes is not None
+                else []
+            )
+
 
 @dataclass
 class PersonalizedJobScore:
@@ -93,7 +119,7 @@ def compute_location_score(
     job_location: str, preferred_locations: Sequence[str]
 ) -> float:
     """Compute location alignment score in [0.0, 1.0]."""
-    if not preferred_locations:
+    if preferred_locations is None or len(preferred_locations) == 0:
         return 1.0  # Open to any location
 
     job_loc_norm = job_location.lower().strip()
@@ -110,7 +136,7 @@ def compute_location_score(
 
 def compute_work_mode_score(job_mode: str, preferred_modes: Sequence[str]) -> float:
     """Compute work mode alignment score in [0.0, 1.0]."""
-    if not preferred_modes:
+    if preferred_modes is None or len(preferred_modes) == 0:
         return 1.0  # Open to any work mode
 
     job_mode_norm = job_mode.lower().strip()
@@ -134,7 +160,11 @@ def filter_hard_constraints(
 
     for job in candidates:
         # Check Work Mode constraint
-        if preferences.require_work_mode and preferences.preferred_work_modes:
+        if (
+            preferences.require_work_mode
+            and preferences.preferred_work_modes is not None
+            and len(preferences.preferred_work_modes) > 0
+        ):
             job_mode = str(job.get("work_mode", "")).lower().strip()
             allowed_modes = {
                 m.lower().strip() for m in preferences.preferred_work_modes
@@ -143,7 +173,11 @@ def filter_hard_constraints(
                 continue
 
         # Check Location constraint
-        if preferences.require_location and preferences.preferred_locations:
+        if (
+            preferences.require_location
+            and preferences.preferred_locations is not None
+            and len(preferences.preferred_locations) > 0
+        ):
             job_loc = str(job.get("location", "")).lower().strip()
             job_mode = str(job.get("work_mode", "")).lower().strip()
 

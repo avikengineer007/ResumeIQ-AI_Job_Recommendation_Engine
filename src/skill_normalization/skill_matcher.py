@@ -70,7 +70,14 @@ class SkillMatcher:
         Returns:
             Structured SkillMatchResult with matched, related, missing items and overall score.
         """
-        cand_set = set(candidate_skill_ids)
+        cand_set = {
+            (
+                item.get("skill_id", item.get("name", ""))
+                if isinstance(item, dict)
+                else (item.skill_id if hasattr(item, "skill_id") else str(item))
+            )
+            for item in candidate_skill_ids
+        }
         result = SkillMatchResult()
 
         total_possible_score = 0.0

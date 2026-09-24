@@ -68,13 +68,20 @@ def format_job_text(job: dict[str, Any], template_version: str = "v1") -> str:
 def format_resume_text(resume: dict[str, Any], template_version: str = "v1") -> str:
     """Format structured resume data into an embedding text payload."""
     skills_raw = resume.get("skills", [])
+    if hasattr(skills_raw, "tolist"):
+        skills_raw = skills_raw.tolist()
     if isinstance(skills_raw, list):
-        skills_str = ", ".join(str(s) for s in skills_raw)
+        skills_str = ", ".join(
+            s.get("name", s.get("skill_id", str(s))) if isinstance(s, dict) else str(s)
+            for s in skills_raw
+        )
     else:
         skills_str = str(skills_raw).strip()
 
     summary = str(resume.get("summary", "")).strip()
     exp_raw = resume.get("experience", "")
+    if hasattr(exp_raw, "tolist"):
+        exp_raw = exp_raw.tolist()
     if isinstance(exp_raw, list):
         exp_str = " ".join(
             str(e.get("description", "")) if isinstance(e, dict) else str(e)
