@@ -5,12 +5,15 @@ retriever execution and metric computation parity. This is NOT a formal RQ1 rese
 Formal RQ1 evaluation is executed in Phase 17 using annotated qrels across frozen validation/test splits.
 """
 
+import pytest
+
 from src.embeddings.embedder import DenseEmbedder, EmbeddingManifest, format_job_text
 from src.embeddings.faiss_index import FaissVectorIndex
 from src.evaluation.metrics import evaluate_ranking_dataset
 from src.retrieval.bm25_retriever import BM25Retriever
 
 
+@pytest.mark.slow
 def test_bm25_vs_dense_retrieval_comparison() -> None:
     # 1. Benchmark Job Corpus (Toy synthetic fixture)
     jobs = [

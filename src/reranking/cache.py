@@ -5,10 +5,10 @@ to eliminate redundant transformer forward passes across experimental ablation r
 (Ablations A-F in Phase 17/18).
 """
 
-from collections.abc import Sequence
 import hashlib
-from pathlib import Path
 import sqlite3
+from collections.abc import Sequence
+from pathlib import Path
 
 
 def compute_text_hash(text: str) -> str:
