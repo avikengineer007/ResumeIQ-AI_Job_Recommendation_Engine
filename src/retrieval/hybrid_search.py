@@ -139,6 +139,7 @@ class HybridSearchEngine:
         self.vector_index = vector_index
         self.embedder = embedder
         self.rrf_k = rrf_k
+        # TODO(Phase 10): tune fusion weights (0.35/0.45/0.20) on validation split
         self.linear_weights = linear_weights or {
             "bm25": 0.35,
             "vector": 0.45,

@@ -16,6 +16,7 @@ vector_search:
 fusion:
   default_mode: "rrf" # "rrf" or "weighted"
   rrf_k: 60
+  # TODO(Phase 10): tune on validation split (currently heuristic defaults)
   weighted_weights:
     bm25: 0.35
     vector: 0.45
