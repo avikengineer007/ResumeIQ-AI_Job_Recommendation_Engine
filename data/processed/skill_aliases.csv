@@ -1,0 +1,79 @@
+alias,canonical_skill_id,match_type
+python,sk_python,synonym
+python3,sk_python,version_strip
+python 3,sk_python,version_strip
+python 3.11,sk_python,version_strip
+py,sk_python,abbreviation
+javascript,sk_javascript,synonym
+js,sk_javascript,abbreviation
+ecmascript,sk_javascript,synonym
+typescript,sk_typescript,synonym
+ts,sk_typescript,abbreviation
+golang,sk_golang,synonym
+go,sk_golang,synonym
+c,sk_c_lang,synonym
+c language,sk_c_lang,synonym
+c++,sk_cpp,synonym
+cpp,sk_cpp,synonym
+r,sk_r_lang,synonym
+r language,sk_r_lang,synonym
+swift,sk_swift,synonym
+rust,sk_rust,synonym
+sql,sk_sql,synonym
+structured query language,sk_sql,expansion
+postgres,sk_postgresql,synonym
+postgresql,sk_postgresql,synonym
+psql,sk_postgresql,abbreviation
+mysql,sk_mysql,synonym
+redis,sk_redis,synonym
+mongodb,sk_mongodb,synonym
+mongo,sk_mongodb,synonym
+machine learning,sk_machine_learning,synonym
+machine-learning,sk_machine_learning,punctuation
+ml,sk_machine_learning,abbreviation
+deep learning,sk_deep_learning,synonym
+deep-learning,sk_deep_learning,punctuation
+dl,sk_deep_learning,abbreviation
+natural language processing,sk_nlp,synonym
+nlp,sk_nlp,abbreviation
+computer vision,sk_computer_vision,synonym
+cv,sk_computer_vision,abbreviation
+pytorch,sk_pytorch,synonym
+torch,sk_pytorch,synonym
+tensorflow,sk_tensorflow,synonym
+tf,sk_tensorflow,abbreviation
+scikit-learn,sk_scikit_learn,synonym
+scikit learn,sk_scikit_learn,punctuation
+sklearn,sk_scikit_learn,abbreviation
+pandas,sk_pandas,synonym
+numpy,sk_numpy,synonym
+spacy,sk_spacy,synonym
+huggingface,sk_transformers,synonym
+transformers,sk_transformers,synonym
+faiss,sk_faiss,synonym
+fastapi,sk_fastapi,synonym
+react,sk_react,synonym
+reactjs,sk_react,synonym
+react.js,sk_react,punctuation
+spring,sk_spring,synonym
+spring boot,sk_spring,synonym
+springboot,sk_spring,synonym
+docker,sk_docker,synonym
+kubernetes,sk_kubernetes,synonym
+k8s,sk_kubernetes,abbreviation
+aws,sk_aws,abbreviation
+amazon web services,sk_aws,expansion
+gcp,sk_gcp,abbreviation
+google cloud,sk_gcp,synonym
+google cloud platform,sk_gcp,expansion
+azure,sk_azure,synonym
+microsoft azure,sk_azure,expansion
+git,sk_git,synonym
+github,sk_git,synonym
+ci/cd,sk_ci_cd,synonym
+ci-cd,sk_ci_cd,punctuation
+cicd,sk_ci_cd,abbreviation
+continuous integration,sk_ci_cd,synonym
+communication,sk_communication,synonym
+problem solving,sk_problem_solving,synonym
+problem-solving,sk_problem_solving,punctuation

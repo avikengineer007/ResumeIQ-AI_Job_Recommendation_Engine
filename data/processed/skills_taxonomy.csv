@@ -1,0 +1,39 @@
+skill_id,canonical_name,category,skill_type,parent_skill_id,description,taxonomy_version
+sk_python,Python,Programming Languages,technical,,General-purpose programming language,1.0.0
+sk_javascript,JavaScript,Programming Languages,technical,,High-level interpreted scripting language,1.0.0
+sk_typescript,TypeScript,Programming Languages,technical,sk_javascript,Typed superset of JavaScript,1.0.0
+sk_golang,Go,Programming Languages,technical,,Compiled programming language developed by Google,1.0.0
+sk_c_lang,C,Programming Languages,technical,,General-purpose procedural programming language,1.0.0
+sk_cpp,C++,Programming Languages,technical,sk_c_lang,General-purpose object-oriented language,1.0.0
+sk_r_lang,R,Programming Languages,technical,,Programming language for statistical computing,1.0.0
+sk_swift,Swift,Programming Languages,technical,,General-purpose compiled language developed by Apple,1.0.0
+sk_rust,Rust,Programming Languages,technical,,Systems programming language focused on safety,1.0.0
+sk_sql,SQL,Database,technical,,Standard language for relational database management,1.0.0
+sk_postgresql,PostgreSQL,Database,tool,sk_sql,Open source object-relational database system,1.0.0
+sk_mysql,MySQL,Database,tool,sk_sql,Open source relational database management system,1.0.0
+sk_redis,Redis,Database,tool,,In-memory data structure store,1.0.0
+sk_mongodb,MongoDB,Database,tool,,Document-oriented NoSQL database,1.0.0
+sk_machine_learning,Machine Learning,Artificial Intelligence,domain,,Branch of AI focused on data-driven predictive models,1.0.0
+sk_deep_learning,Deep Learning,Artificial Intelligence,domain,sk_machine_learning,Subfield of ML based on artificial neural networks,1.0.0
+sk_nlp,Natural Language Processing,Artificial Intelligence,domain,sk_machine_learning,Subfield of AI focused on human language processing,1.0.0
+sk_computer_vision,Computer Vision,Artificial Intelligence,domain,sk_machine_learning,Field of AI dealing with image and video understanding,1.0.0
+sk_pytorch,PyTorch,Machine Learning Frameworks,tool,sk_deep_learning,Open source machine learning framework based on Torch,1.0.0
+sk_tensorflow,TensorFlow,Machine Learning Frameworks,tool,sk_deep_learning,Open source platform for machine learning,1.0.0
+sk_scikit_learn,scikit-learn,Machine Learning Frameworks,tool,sk_machine_learning,Python module for machine learning and data mining,1.0.0
+sk_pandas,Pandas,Data Analysis,tool,sk_python,Python library for data manipulation and analysis,1.0.0
+sk_numpy,NumPy,Data Analysis,tool,sk_python,Python library for numerical computing,1.0.0
+sk_spacy,spaCy,Natural Language Processing,tool,sk_nlp,Industrial-strength natural language processing library,1.0.0
+sk_transformers,Transformers,Natural Language Processing,tool,sk_deep_learning,State-of-the-art pretrained transformer models,1.0.0
+sk_faiss,FAISS,Information Retrieval,tool,,Library for efficient similarity search of dense vectors,1.0.0
+sk_fastapi,FastAPI,Web Frameworks,tool,sk_python,Modern fast web framework for building APIs with Python,1.0.0
+sk_react,React,Web Frameworks,tool,sk_javascript,JavaScript library for building user interfaces,1.0.0
+sk_spring,Spring,Web Frameworks,tool,,Application framework and inversion of control container for Java,1.0.0
+sk_docker,Docker,DevOps,tool,,Platform for developing shipping and running applications in containers,1.0.0
+sk_kubernetes,Kubernetes,DevOps,tool,sk_docker,Automated container deployment scaling and management,1.0.0
+sk_aws,AWS,Cloud Computing,tool,,Amazon Web Services cloud computing platform,1.0.0
+sk_gcp,Google Cloud Platform,Cloud Computing,tool,,Suite of cloud computing services by Google,1.0.0
+sk_azure,Microsoft Azure,Cloud Computing,tool,,Cloud computing service created by Microsoft,1.0.0
+sk_git,Git,Version Control,tool,,Distributed version control system,1.0.0
+sk_ci_cd,CI/CD,DevOps,technical,,Continuous Integration and Continuous Delivery automation,1.0.0
+sk_communication,Communication,Interpersonal,soft,,Effective verbal and written information sharing,1.0.0
+sk_problem_solving,Problem Solving,Cognitive,soft,,Analytical capability to resolve complex technical hurdles,1.0.0
