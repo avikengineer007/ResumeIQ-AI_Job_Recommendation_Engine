@@ -1,8 +1,8 @@
 """Comparative retrieval benchmark test: BM25 vs Dense Vector Retrieval.
 
-Validates that both keyword (BM25) and dense semantic (SentenceTransformer + FAISS)
-retrievers can be evaluated on the exact same benchmark split using Phase 5's
-evaluation metrics harness (NDCG@K, Recall@K, MRR, Precision@K).
+NOTE: This is a pipeline sanity check over synthetic toy fixtures verifying end-to-end
+retriever execution and metric computation parity. This is NOT a formal RQ1 research result.
+Formal RQ1 evaluation is executed in Phase 17 using annotated qrels across frozen validation/test splits.
 """
 
 from src.embeddings.embedder import DenseEmbedder, EmbeddingManifest, format_job_text
@@ -12,7 +12,7 @@ from src.retrieval.bm25_retriever import BM25Retriever
 
 
 def test_bm25_vs_dense_retrieval_comparison() -> None:
-    # 1. Benchmark Job Corpus
+    # 1. Benchmark Job Corpus (Toy synthetic fixture)
     jobs = [
         {
             "id": "job_01",
@@ -96,11 +96,10 @@ def test_bm25_vs_dense_retrieval_comparison() -> None:
     )
 
     # 5. Sanity Checks & Calibrated Comparative Assertions
-    # Both systems must achieve positive MRR and NDCG on clear domain queries
     assert bm25_metrics["mrr"] > 0.0
     assert dense_metrics["mrr"] > 0.0
     assert bm25_metrics["ndcg@3"] > 0.0
     assert dense_metrics["ndcg@3"] > 0.0
 
-    # Confirm metrics dictionary format parity
+    # Parity check on returned evaluation metrics
     assert set(bm25_metrics.keys()) == set(dense_metrics.keys())
