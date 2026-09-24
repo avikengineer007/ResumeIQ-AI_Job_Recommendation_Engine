@@ -1,4 +1,4 @@
-"""Unit tests for structured resume parsing and source span tracking."""
+"""Unit tests for structured resume parsing, date edge cases, and tenure deduplication."""
 
 from src.preprocessing.resume_parser import ResumeParser
 
@@ -72,6 +72,65 @@ def test_overlapping_tenure_calculation():
     assert len(parsed.experience) == 2
     # Combined span is 2020 to 2023 = 3 years (not 3 + 1 = 4)
     assert parsed.total_years == 3.0
+
+
+def test_concurrent_and_promotion_tenure_dedup():
+    """Verify concurrent roles and promotions within the same company are not double counted."""
+    resume_text = (
+        "Experience\n"
+        "Staff Software Engineer at MetaCorp\n"
+        "2021 - 2024\n"
+        "Technical leadership and architectural design.\n\n"
+        "Senior Software Engineer at MetaCorp\n"
+        "2019 - 2021\n"
+        "Continuous internal promotion: 2019 to 2024 continuous.\n\n"
+        "Technical Advisor at StartupInc\n"
+        "2022 - 2023\n"  # Concurrent role during 2021-2024 tenure
+        "Advising on ML search backend.\n"
+    )
+    parser = ResumeParser()
+    parsed = parser.parse(resume_text)
+
+    assert len(parsed.experience) == 3
+    # 2019 to 2024 span is 5.0 years; concurrent 2022-2023 role must not add to 5.0
+    assert parsed.total_years == 5.0
+
+
+def test_international_and_slash_date_formats():
+    """Verify parsing non-US dates (MM/YYYY), dot dates (YYYY.MM), and Present/Current keywords."""
+    resume_text = (
+        "Experience\n"
+        "Senior Data Engineer at GlobalBank\n"
+        "06/2020 - 08/2023\n"
+        "Built ETL lakehouse.\n\n"
+        "Data Analyst at InfoSys\n"
+        "2018.01 - 2020.05\n"
+        "SQL queries and dashboarding.\n"
+    )
+    parser = ResumeParser()
+    parsed = parser.parse(resume_text)
+
+    assert len(parsed.experience) == 2
+    assert parsed.experience[0].start_year == 2020
+    assert parsed.experience[0].end_year == 2023
+    assert parsed.experience[1].start_year == 2018
+    assert parsed.experience[1].end_year == 2020
+
+
+def test_single_year_experience_entry():
+    """Verify single-year entries (e.g., 'Research Fellow (2021)') are parsed properly."""
+    resume_text = (
+        "Experience\n"
+        "Research Fellow at Oxford (2021)\n"
+        "Published NLP benchmark paper.\n"
+    )
+    parser = ResumeParser()
+    parsed = parser.parse(resume_text)
+
+    assert len(parsed.experience) == 1
+    assert parsed.experience[0].start_year == 2021
+    assert parsed.experience[0].end_year == 2021
+    assert parsed.total_years == 1.0
 
 
 def test_source_spans_are_valid_substrings():

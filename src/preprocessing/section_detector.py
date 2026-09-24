@@ -109,6 +109,26 @@ class SectionDetector:
             stripped = line.strip()
             # Headers are typically short lines (< 50 chars)
             if stripped and len(stripped) < 50:
+                # False positive guards: do not treat bullets, sentences with periods, or descriptive phrases as headers
+                if (
+                    stripped.endswith((".", ","))
+                    or any(
+                        w in stripped.lower()
+                        for w in [
+                            "used",
+                            "including",
+                            "such as",
+                            "gained",
+                            "proficient in",
+                            "experience with",
+                        ]
+                    )
+                    or stripped.startswith(("•", "* ", "- "))
+                    or line.startswith(("   ", "\t"))
+                ):
+                    current_offset += len(line)
+                    continue
+
                 # Remove markdown formatting or underlines
                 clean_line = re.sub(r"^#+\s*", "", stripped).rstrip(":")
                 for sec_type, regex in self.compiled_patterns:

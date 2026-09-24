@@ -1,4 +1,4 @@
-"""Unit tests for resume section detection."""
+"""Unit tests for resume section detection with adversarial and malformed layout tests."""
 
 from src.preprocessing.section_detector import SectionDetector, SectionType
 
@@ -73,3 +73,53 @@ def test_fallback_unstructured_text():
     assert len(sections) == 1
     assert sections[0].section_type == SectionType.OTHER
     assert sections[0].text == text
+
+
+def test_adversarial_false_positive_headers():
+    """Verify that phrases like 'Skills used: Python, SQL' inside bullet points do NOT trigger a section header."""
+    adversarial_text = (
+        "Experience\n"
+        "Lead Engineer at CloudSys\n"
+        "2020 - 2023\n"
+        "• Built distributed streaming microservices using Kafka and Go.\n"
+        "• Skills used: Python, SQL, Redis, and PyTorch.\n"
+        "• Experience with Docker container orchestration and CI/CD pipelines.\n"
+        "• Technologies including AWS, Terraform, and Kubernetes.\n\n"
+        "Education\n"
+        "B.S. in Computer Science, 2019\n"
+    )
+    detector = SectionDetector()
+    sections = detector.detect_sections(adversarial_text)
+    section_types = [s.section_type for s in sections]
+
+    # There should only be EXPERIENCE and EDUCATION, not SKILLS!
+    assert SectionType.EXPERIENCE in section_types
+    assert SectionType.EDUCATION in section_types
+    assert SectionType.SKILLS not in section_types
+
+    # Ensure the bullet points remain inside the Experience section text
+    exp_sec = next(s for s in sections if s.section_type == SectionType.EXPERIENCE)
+    assert "Skills used: Python, SQL, Redis, and PyTorch." in exp_sec.text
+    assert "Experience with Docker" in exp_sec.text
+
+
+def test_malformed_multicolumn_layout():
+    """Verify handling of malformed multi-column text with irregular linebreaks and tabs."""
+    messy_text = (
+        "CANDIDATE NAME\t\t\tPAGE 1 OF 2\n"
+        "email@example.com | +1 555 0199\n\n"
+        "EXPERIENCE\t\t\t\t\t\t\tEDUCATION\n"
+        "ML Engineer at Corp\t\t\t\t\tB.S. CS, 2020\n"
+        "2021 - Present\n"
+        "Developed neural search engines.\n\n"
+        "SKILLS\n"
+        "Python, PyTorch, FAISS, Docker\n"
+    )
+    detector = SectionDetector()
+    sections = detector.detect_sections(messy_text)
+    section_types = [s.section_type for s in sections]
+
+    # Must at least capture SKILLS cleanly despite irregular header line formatting
+    assert SectionType.SKILLS in section_types
+    skills_sec = next(s for s in sections if s.section_type == SectionType.SKILLS)
+    assert "Python, PyTorch, FAISS, Docker" in skills_sec.text

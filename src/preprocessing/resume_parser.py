@@ -35,17 +35,50 @@ FIELD_PATTERNS = [
 ]
 _COMPILED_FIELDS = [re.compile(p, re.IGNORECASE) for p in FIELD_PATTERNS]
 
-# Date range extraction patterns
+# Date range extraction patterns supporting international formats (dots, slashes, month names)
 DATE_RANGE_REGEX = re.compile(
-    r"\b((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
-    r"Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|\d{1,2}/\d{1,2}|\d{4}))"
+    r"\b((?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
+    r"Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}|"
+    r"\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}|\d{4}))"
     r"(?:\s*(?:-|–|—|to)\s*)"
-    r"((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
-    r"Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?|\d{1,2}/\d{1,2}|\d{4}|Present|Current))\b",
+    r"((?:(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|"
+    r"Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{4}|"
+    r"\d{1,2}[/.-]\d{4}|\d{4}[/.-]\d{1,2}|\d{4}|Present|Current))\b",
     re.IGNORECASE,
 )
 
 YEAR_REGEX = re.compile(r"\b(19\d{2}|20\d{2})\b")
+MONTH_NAME_MAP = {
+    "jan": 1,
+    "january": 1,
+    "feb": 2,
+    "february": 2,
+    "mar": 3,
+    "march": 3,
+    "apr": 4,
+    "april": 4,
+    "may": 5,
+    "jun": 6,
+    "june": 6,
+    "jul": 7,
+    "july": 7,
+    "aug": 8,
+    "august": 8,
+    "sep": 9,
+    "september": 9,
+    "oct": 10,
+    "october": 10,
+    "nov": 11,
+    "november": 11,
+    "dec": 12,
+    "december": 12,
+}
+
+
+ROLE_TITLE_REGEX = re.compile(
+    r"\b(?:engineer|developer|intern|manager|lead|analyst|scientist|consultant|architect|designer|lecturer|specialist|administrator|fellow|researcher|associate|director|advisor|instructor|professor|head)\b",
+    re.IGNORECASE,
+)
 
 
 @dataclass
@@ -195,34 +228,39 @@ class ResumeParser:
             abs_start = section.start_char + line_pos if line_pos != -1 else curr_offset
 
             date_match = DATE_RANGE_REGEX.search(line)
+            is_bullet = line.startswith(("•", "* ", "- ", "– "))
+            is_desc_phrase = any(
+                w in line.lower()
+                for w in [
+                    "worked",
+                    "built",
+                    "developed",
+                    "designed",
+                    "shipped",
+                    "responsible",
+                    "managed",
+                    "promotion",
+                    "contributed",
+                    "improved",
+                ]
+            )
+
             is_title_candidate = (
-                any(
-                    term in line.lower()
-                    for term in [
-                        "engineer",
-                        "developer",
-                        "intern",
-                        "manager",
-                        "lead",
-                        "analyst",
-                        "scientist",
-                        "consultant",
-                        "architect",
-                        "designer",
-                        "lecturer",
-                        "specialist",
-                        "administrator",
-                    ]
-                )
+                not is_bullet
+                and not is_desc_phrase
+                and not line.endswith(".")
+                and bool(ROLE_TITLE_REGEX.search(line))
                 and len(line) < 80
             )
 
-            # Case 1: Active title exists and this line provides its date range
+            # Case 1: Active title exists and this line provides its date range (and is not a description sentence)
             if (
                 date_match
                 and current_title
                 and not current_date_str
                 and not is_title_candidate
+                and not is_desc_phrase
+                and len(line) < 50
             ):
                 current_date_str = date_match.group(0)
                 start_str, end_str = date_match.group(1), date_match.group(2)
@@ -232,13 +270,18 @@ class ResumeParser:
                 else:
                     current_end_year = self._extract_year(end_str)
 
-                # Check if there is an organization in this line as well
                 rem = line[: date_match.start()].strip(" |-–—,")
                 if rem and not current_org:
                     current_org = rem
 
-            # Case 2: New role boundary detected (by title candidate or new date line)
-            elif is_title_candidate or (date_match and not current_title):
+            # Case 2: New role boundary detected
+            elif is_title_candidate or (
+                date_match
+                and not current_title
+                and not is_bullet
+                and not is_desc_phrase
+                and len(line) < 50
+            ):
                 flush_current(abs_start)
                 item_start_char = abs_start
 
@@ -257,6 +300,12 @@ class ResumeParser:
                     else:
                         current_title = "Experience"
                 else:
+                    # Check for single-year mention in title line like "Research Fellow at Oxford (2021)"
+                    single_year = self._extract_year(line)
+                    if single_year:
+                        current_start_year = single_year
+                        current_end_year = single_year
+                        current_date_str = str(single_year)
                     current_title, current_org = self._split_title_org(line)
             else:
                 current_desc_lines.append(line)
@@ -285,17 +334,15 @@ class ResumeParser:
         intervals: list[tuple[int, int]] = []
         for exp in experiences:
             if exp.start_year and exp.end_year:
-                s = min(exp.start_year, exp.end_year)
-                e = max(exp.start_year, exp.end_year)
-                intervals.append((s, e))
+                s_y = min(exp.start_year, exp.end_year)
+                e_y = max(exp.start_year, exp.end_year)
+                intervals.append((s_y, max(s_y + 1, e_y)))
             elif exp.months > 0:
-                # Approximate start/end if only months are known
-                curr_y = datetime.now(UTC).year
+                now_y = datetime.now(UTC).year
                 years_span = max(1, round(exp.months / 12))
-                intervals.append((curr_y - years_span, curr_y))
+                intervals.append((now_y - years_span, now_y))
 
         if not intervals:
-            # Fallback to direct months sum
             total_months = sum(e.months for e in experiences)
             return round(total_months / 12.0, 1)
 
