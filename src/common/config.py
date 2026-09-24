@@ -5,12 +5,13 @@ No hard-coded paths, seeds, model names, or thresholds.
 All tunable settings are managed via YAML files in configs/ with optional environment overrides.
 """
 
-from functools import lru_cache
 import os
+from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field, field_validator
+from typing import Any
+
 import yaml
+from pydantic import BaseModel, Field, field_validator
 
 
 class SystemSettings(BaseModel):
@@ -63,7 +64,7 @@ class DatabaseSettings(BaseModel):
     echo_sql: bool = Field(default=False)
     pool_size: int = Field(default=10)
     max_overflow: int = Field(default=20)
-    url: Optional[str] = Field(default=None)
+    url: str | None = Field(default=None)
 
 
 class EmbeddingCandidate(BaseModel):
@@ -79,7 +80,7 @@ class EmbeddingSettings(BaseModel):
     default_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2")
     normalize: bool = Field(default=True)
     batch_size: int = Field(default=64)
-    candidates: List[EmbeddingCandidate] = Field(default_factory=list)
+    candidates: list[EmbeddingCandidate] = Field(default_factory=list)
 
 
 class RerankerCandidate(BaseModel):
@@ -91,12 +92,14 @@ class RerankerSettings(BaseModel):
     default_model: str = Field(default="cross-encoder/ms-marco-MiniLM-L-6-v2")
     max_length: int = Field(default=512)
     batch_size: int = Field(default=32)
-    candidates: List[RerankerCandidate] = Field(default_factory=list)
+    candidates: list[RerankerCandidate] = Field(default_factory=list)
 
 
 class SpacySettings(BaseModel):
     model_name: str = Field(default="en_core_web_sm")
-    ner_labels: List[str] = Field(default_factory=lambda: ["SKILL", "DEGREE", "EXPERIENCE", "ORGANIZATION"])
+    ner_labels: list[str] = Field(
+        default_factory=lambda: ["SKILL", "DEGREE", "EXPERIENCE", "ORGANIZATION"]
+    )
 
 
 class BM25Settings(BaseModel):
@@ -117,7 +120,7 @@ class VectorSearchSettings(BaseModel):
 class FusionSettings(BaseModel):
     default_mode: str = Field(default="rrf")
     rrf_k: int = Field(default=60)
-    weighted_weights: Dict[str, float] = Field(
+    weighted_weights: dict[str, float] = Field(
         default_factory=lambda: {"bm25": 0.35, "vector": 0.45, "skill": 0.20}
     )
 
@@ -136,7 +139,7 @@ class RerankingSettings(BaseModel):
 
 
 class PersonalizationSettings(BaseModel):
-    weights: Dict[str, float] = Field(
+    weights: dict[str, float] = Field(
         default_factory=lambda: {
             "s_rerank": 0.35,
             "s_sem": 0.20,
@@ -153,6 +156,7 @@ class PersonalizationSettings(BaseModel):
 
 class AppConfig(BaseModel):
     """Unified application configuration object."""
+
     system: SystemSettings = Field(default_factory=SystemSettings)
     paths: PathSettings = Field(default_factory=PathSettings)
     dataset: DatasetSettings = Field(default_factory=DatasetSettings)
@@ -166,18 +170,20 @@ class AppConfig(BaseModel):
     fusion: FusionSettings = Field(default_factory=FusionSettings)
     skill_matching: SkillMatchingSettings = Field(default_factory=SkillMatchingSettings)
     reranking: RerankingSettings = Field(default_factory=RerankingSettings)
-    personalization: PersonalizationSettings = Field(default_factory=PersonalizationSettings)
+    personalization: PersonalizationSettings = Field(
+        default_factory=PersonalizationSettings
+    )
 
 
-def _load_yaml(file_path: Path) -> Dict[str, Any]:
+def _load_yaml(file_path: Path) -> dict[str, Any]:
     if not file_path.exists():
         return {}
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         data = yaml.safe_load(f) or {}
     return data
 
 
-def load_config(config_dir: Optional[str | Path] = None) -> AppConfig:
+def load_config(config_dir: str | Path | None = None) -> AppConfig:
     """Load configuration from YAML files in config_dir, applying environment overrides."""
     if config_dir is None:
         base_dir = Path(__file__).resolve().parent.parent.parent
@@ -189,7 +195,7 @@ def load_config(config_dir: Optional[str | Path] = None) -> AppConfig:
     model_yaml = _load_yaml(configs_path / "model_config.yaml")
     retrieval_yaml = _load_yaml(configs_path / "retrieval_config.yaml")
 
-    merged: Dict[str, Any] = {}
+    merged: dict[str, Any] = {}
     merged.update(main_yaml)
     merged.update(model_yaml)
     merged.update(retrieval_yaml)
@@ -205,7 +211,7 @@ def load_config(config_dir: Optional[str | Path] = None) -> AppConfig:
     return AppConfig.model_validate(merged)
 
 
-@lru_cache()
+@lru_cache
 def get_config() -> AppConfig:
     """Get cached singleton configuration instance."""
     return load_config()

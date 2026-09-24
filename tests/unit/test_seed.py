@@ -1,11 +1,14 @@
 """Unit tests for deterministic seed utilities."""
 
 import random
+
 import numpy as np
+
 from src.common.seed import set_seed, temporary_seed
 
 try:
     import torch
+
     HAS_TORCH = True
 except ImportError:
     HAS_TORCH = False

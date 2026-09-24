@@ -1,9 +1,10 @@
 """Unit tests for configuration loading and validation."""
 
-import os
 from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
+
 from src.common.config import AppConfig, DatasetSettings, load_config
 
 

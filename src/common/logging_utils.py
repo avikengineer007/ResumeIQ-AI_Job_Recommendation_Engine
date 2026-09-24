@@ -5,15 +5,15 @@ Never log resume text or PII (emails, phone numbers, auth secrets).
 Produces parseable JSON logs for observability and auditability.
 """
 
-from contextvars import ContextVar
-from datetime import datetime, timezone
 import json
 import logging
 import re
-from typing import Any, Dict, List, Optional
+from contextvars import ContextVar
+from datetime import UTC, datetime
+from typing import Any
 
 # Context variable for tracing requests across functions and threads
-request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
+request_id_ctx: ContextVar[str | None] = ContextVar("request_id", default=None)
 
 # Patterns to sanitize accidental PII in log text
 EMAIL_REGEX = re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+")
@@ -44,10 +44,7 @@ def sanitize_value(key: str, value: Any, sensitive_keys: set[str]) -> Any:
         return cleaned
 
     if isinstance(value, dict):
-        return {
-            k: sanitize_value(k, v, sensitive_keys)
-            for k, v in value.items()
-        }
+        return {k: sanitize_value(k, v, sensitive_keys) for k, v in value.items()}
 
     if isinstance(value, (list, tuple, set)):
         return [sanitize_value(key, v, sensitive_keys) for v in value]
@@ -58,13 +55,15 @@ def sanitize_value(key: str, value: Any, sensitive_keys: set[str]) -> Any:
 class JSONFormatter(logging.Formatter):
     """Custom logging formatter outputting clean, standardized JSON lines."""
 
-    def __init__(self, sensitive_keys: Optional[List[str]] = None, *args: Any, **kwargs: Any) -> None:
+    def __init__(
+        self, sensitive_keys: list[str] | None = None, *args: Any, **kwargs: Any
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.sensitive_keys = DEFAULT_SENSITIVE_KEYS.union(set(sensitive_keys or []))
 
     def format(self, record: logging.LogRecord) -> str:
-        log_payload: Dict[str, Any] = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+        log_payload: dict[str, Any] = {
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": record.getMessage(),
@@ -89,8 +88,7 @@ class JSONFormatter(logging.Formatter):
 
         # Sanitize entire payload before emitting JSON
         sanitized = {
-            k: sanitize_value(k, v, self.sensitive_keys)
-            for k, v in log_payload.items()
+            k: sanitize_value(k, v, self.sensitive_keys) for k, v in log_payload.items()
         }
 
         return json.dumps(sanitized, default=str)

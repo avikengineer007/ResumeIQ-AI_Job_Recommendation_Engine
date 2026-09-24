@@ -2,6 +2,7 @@
 
 import json
 import logging
+
 from src.common.logging_utils import (
     JSONFormatter,
     get_logger,
@@ -59,7 +60,10 @@ def test_pii_redaction_in_logs():
 
     # Sensitive key redaction
     assert sanitize_value("password", "supersecret123", sensitive_keys) == "[REDACTED]"
-    assert sanitize_value("resume_text", "John Doe, Python Engineer", sensitive_keys) == "[REDACTED]"
+    assert (
+        sanitize_value("resume_text", "John Doe, Python Engineer", sensitive_keys)
+        == "[REDACTED]"
+    )
 
     # Pattern redaction in arbitrary text
     text_with_pii = "Candidate contact: john.doe@example.com or +1 (555) 123-4567"

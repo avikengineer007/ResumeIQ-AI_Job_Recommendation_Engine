@@ -1,7 +1,9 @@
 """Shared fixtures for pytest test suites."""
 
 from pathlib import Path
+
 import pytest
+
 from src.common.config import AppConfig, load_config
 from src.common.seed import set_seed
 

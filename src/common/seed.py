@@ -4,14 +4,16 @@ Ensures that all stochastic operations across standard Python, NumPy,
 and PyTorch use identical random states.
 """
 
-from contextlib import contextmanager
 import os
 import random
-from typing import Generator, Optional
+from collections.abc import Generator
+from contextlib import contextmanager
+
 import numpy as np
 
 try:
     import torch
+
     HAS_TORCH = True
 except ImportError:
     HAS_TORCH = False
@@ -46,7 +48,11 @@ def temporary_seed(seed: int) -> Generator[None, None, None]:
     py_state = random.getstate()
     np_state = np.random.get_state()
     torch_state = torch.get_rng_state() if HAS_TORCH else None
-    torch_cuda_state = torch.cuda.get_rng_state_all() if (HAS_TORCH and torch.cuda.is_available()) else None
+    torch_cuda_state = (
+        torch.cuda.get_rng_state_all()
+        if (HAS_TORCH and torch.cuda.is_available())
+        else None
+    )
 
     try:
         set_seed(seed)
