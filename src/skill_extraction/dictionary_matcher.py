@@ -84,6 +84,7 @@ NEGATIVE_SIGNALS: dict[str, list[str]] = {
         r"\bspring\s+(?:20\d{2}|19\d{2})\b",
         r"\bspring\s+semester\b",
         r"\bspring\s+break\b",
+        r"\bspring\s+(?:internship|intern)\b",
     ],
     "go": [
         r"\bgo\s+to\b",
@@ -91,6 +92,7 @@ NEGATIVE_SIGNALS: dict[str, list[str]] = {
         r"\bgo\s+through\b",
         r"\bgo\s+live\b",
         r"\bon\s+the\s+go\b",
+        r"\bgo[- ]to[- ]market\b",
     ],
     "swift": [
         r"\bswift\s+action\b",

@@ -24,7 +24,9 @@ class SkillNormalizer:
     def __init__(
         self,
         taxonomy: SkillTaxonomy,
+        # TODO(Phase 10): tune fuzzy threshold on validation split rather than keeping heuristic default
         fuzzy_threshold: float = 92.0,
+        # TODO(Phase 10): tune embedding cosine threshold on validation split rather than keeping heuristic default
         embedding_threshold: float = 0.82,
         embed_fn: Callable[[str], Any] | None = None,
     ) -> None:

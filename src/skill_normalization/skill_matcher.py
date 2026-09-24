@@ -41,9 +41,13 @@ class SkillMatcher:
     def __init__(
         self,
         taxonomy: SkillTaxonomy,
+        # TODO(Phase 10): tune parent credit discount on validation split rather than keeping heuristic default
         parent_discount: float = 0.60,
+        # TODO(Phase 10): tune related credit discount on validation split rather than keeping heuristic default
         related_discount: float = 0.40,
+        # TODO(Phase 10): tune required skill weight on validation split
         required_weight: float = 1.0,
+        # TODO(Phase 10): tune preferred skill weight on validation split
         preferred_weight: float = 0.5,
     ) -> None:
         self.taxonomy = taxonomy
