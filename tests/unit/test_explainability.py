@@ -474,3 +474,99 @@ def test_evidence_builder_adversarial_malformed_inputs() -> None:
     explanation = explainer.explain(evidence, strict=True)
     assert isinstance(explanation, GeneratedExplanation)
     assert explanation.is_verified is True
+
+
+def test_explainability_perturbation_suite() -> None:
+    """Perturbation test: verifies that perturbing candidate skills, experience,
+
+    or requirements accurately changes evidence and that stale or tampered
+    explanations are strictly rejected by the ExplanationVerifier.
+    """
+    builder = EvidenceBuilder()
+    verifier = ExplanationVerifier()
+    explainer = TemplateExplainer(verifier=verifier)
+
+    job = {
+        "job_id": "job_perturb_1",
+        "title": "Senior ML Engineer",
+        "company": "DeepMind Partner",
+        "skills": ["Python", "PyTorch", "AWS"],
+        "required_skills": ["Python", "PyTorch"],
+        "required_years": 3.0,
+        "location": "Remote",
+        "work_mode": "remote",
+    }
+
+    base_candidate = {
+        "resume_id": "res_base",
+        "total_years": 5.0,
+        "skills": ["Python", "PyTorch", "SQL", "Docker"],
+        "preferences": {"role": "Senior ML Engineer", "work_modes": ["remote"]},
+    }
+
+    # 1. Base Evidence & Verified Explanation
+    base_evidence = builder.build_evidence(
+        candidate_resume=base_candidate,
+        job_posting=job,
+        score_info={"final_score": 0.85, "rank": 1},
+        calibrated_probability=0.88,
+    )
+    base_explanation = explainer.explain(base_evidence, auto_verify=True, strict=True)
+    assert base_explanation.is_verified is True
+    base_report = verifier.verify(base_explanation, base_evidence)
+    assert base_report.is_faithful is True
+    assert base_report.faithfulness_score == 1.0
+
+    # 2. Perturbation A: Skill Drop (remove 'PyTorch' from candidate)
+    perturbed_candidate_skills = {
+        "resume_id": "res_base",
+        "total_years": 5.0,
+        "skills": ["Python", "SQL", "Docker"],  # PyTorch removed
+        "preferences": {"role": "Senior ML Engineer", "work_modes": ["remote"]},
+    }
+    perturbed_evidence_skills = builder.build_evidence(
+        candidate_resume=perturbed_candidate_skills,
+        job_posting=job,
+        score_info={"final_score": 0.55, "rank": 3},
+        calibrated_probability=0.50,
+    )
+
+    # PyTorch must now be missing
+    matched_names = {s.skill_name for s in perturbed_evidence_skills.matched_skills}
+    missing_names = {s.skill_name for s in perturbed_evidence_skills.missing_skills}
+    assert "PyTorch" not in matched_names
+    assert "PyTorch" in missing_names
+
+    # The NEW perturbed explanation accurately reflects the drop
+    new_explanation = explainer.explain(
+        perturbed_evidence_skills, auto_verify=True, strict=True
+    )
+    assert "PyTorch" in new_explanation.missing_skills_bullet
+
+    # STALE EXPLANATION REJECTION: Old base explanation claiming PyTorch match MUST be rejected
+    stale_report = verifier.verify(base_explanation, perturbed_evidence_skills)
+    assert stale_report.is_faithful is False
+    assert any("PyTorch" in v for v in stale_report.violations)
+
+    # 3. Perturbation B: Experience Drop (Candidate years dropped from 5.0 to 1.5 years)
+    perturbed_candidate_exp = {
+        "resume_id": "res_base",
+        "total_years": 1.5,  # Requires 3.0 years
+        "skills": ["Python", "PyTorch", "SQL", "Docker"],
+        "preferences": {"role": "Senior ML Engineer", "work_modes": ["remote"]},
+    }
+    perturbed_evidence_exp = builder.build_evidence(
+        candidate_resume=perturbed_candidate_exp,
+        job_posting=job,
+        score_info={"final_score": 0.60, "rank": 2},
+        calibrated_probability=0.62,
+    )
+
+    assert perturbed_evidence_exp.experience.meets_requirement is False
+    assert perturbed_evidence_exp.experience.gap_years == 1.5
+
+    exp_explanation = explainer.explain(
+        perturbed_evidence_exp, auto_verify=True, strict=True
+    )
+    assert "1.5-year gap" in exp_explanation.experience_statement
+    assert "3.0 years" in exp_explanation.experience_statement

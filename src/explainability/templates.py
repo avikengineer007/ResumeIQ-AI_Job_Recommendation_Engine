@@ -91,7 +91,7 @@ class TemplateExplainer:
         n_matched = len(evidence.matched_skills)
         n_missing = len(evidence.missing_skills)
         total_skills = n_matched + n_missing
-        match_pct = int(round((n_matched / max(1, total_skills)) * 100))
+        match_pct = round((n_matched / max(1, total_skills)) * 100)
 
         headline = f"Strong Match ({match_pct}% skill overlap) driven by {evidence.scores.primary_driver}"
         if n_matched == 0:
@@ -200,7 +200,7 @@ class TemplateExplainer:
         # 6. Transparency Statement
         scores = evidence.scores
         if scores.calibrated_probability is not None:
-            cal_pct = int(round(scores.calibrated_probability * 100))
+            cal_pct = round(scores.calibrated_probability * 100)
             prob_str = f"Estimated Match Confidence: ~{cal_pct}% (provisional)"
         else:
             prob_str = f"Personalized Fit Score: {scores.final_score:.2f}"

@@ -28,10 +28,12 @@ class VerificationReport:
     violations: list[str] = field(default_factory=list)
     verified_skills: list[str] = field(default_factory=list)
     unverified_claims: list[str] = field(default_factory=list)
+    faithfulness_score: float = 1.0
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "is_faithful": self.is_faithful,
+            "faithfulness_score": self.faithfulness_score,
             "violations": self.violations,
             "verified_skills": self.verified_skills,
             "unverified_claims": self.unverified_claims,
@@ -77,9 +79,16 @@ class ExplanationVerifier:
             if re.search(pattern, all_text.lower()):
                 verified_skills.append(s_orig)
 
+        matched_skill_names = {
+            s.skill_name.lower(): s.skill_name for s in evidence.matched_skills
+        }
+
         for bullet in explanation.skill_bullets:
             if ":" in bullet:
-                _, items_str = bullet.split(":", 1)
+                header, items_str = bullet.split(":", 1)
+                is_direct_bullet = (
+                    "direct" in header.lower() or "match" in header.lower()
+                )
                 for item in re.split(r"[,;]", items_str):
                     clean_item = re.sub(r"\(.*?\)", "", item).strip()
                     clean_item = re.sub(r"\band\b.*", "", clean_item).strip()
@@ -96,6 +105,16 @@ class ExplanationVerifier:
                         ):
                             violations.append(
                                 f"Explanation bullet cites skill '{clean_item}' which is absent from evidence."
+                            )
+                        elif (
+                            is_direct_bullet
+                            and clean_item.lower() not in matched_skill_names
+                            and "more" not in clean_item.lower()
+                            and "overlap" not in clean_item.lower()
+                            and "identified" not in clean_item.lower()
+                        ):
+                            violations.append(
+                                f"Explanation claims '{clean_item}' as a direct match, but it is not in matched skills."
                             )
 
         # 2. Honest Skill Gap Reporting Check
@@ -159,9 +178,9 @@ class ExplanationVerifier:
             found_pcts = [int(p) for p in pct_matches]
             n_matched = len(evidence.matched_skills)
             n_missing = len(evidence.missing_skills)
-            valid_pcts = {int(round((n_matched / max(1, n_matched + n_missing)) * 100))}
+            valid_pcts = {round((n_matched / max(1, n_matched + n_missing)) * 100)}
             if evidence.scores.calibrated_probability is not None:
-                valid_pcts.add(int(round(evidence.scores.calibrated_probability * 100)))
+                valid_pcts.add(round(evidence.scores.calibrated_probability * 100))
 
             for pct in found_pcts:
                 if not any(abs(pct - vp) <= 3 for vp in valid_pcts):
@@ -171,8 +190,17 @@ class ExplanationVerifier:
                     )
 
         is_faithful = len(violations) == 0
+        total_claims = max(
+            1, len(verified_skills) + len(unverified_claims) + len(violations)
+        )
+        faithfulness_score = (
+            max(0.0, round(1.0 - (len(violations) / total_claims), 4))
+            if violations
+            else 1.0
+        )
         return VerificationReport(
             is_faithful=is_faithful,
+            faithfulness_score=faithfulness_score,
             violations=violations,
             verified_skills=verified_skills,
             unverified_claims=unverified_claims,
