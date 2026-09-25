@@ -3,7 +3,7 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 from pydantic import ValidationError
@@ -49,7 +49,7 @@ class ResumeLoader:
         elif suffix in (".docx", ".doc"):
             import docx
 
-            doc = docx.Document(p)
+            doc = docx.Document(str(p))
             paragraphs = [para.text for para in doc.paragraphs if para.text.strip()]
             return "\n".join(paragraphs)
 
@@ -78,10 +78,16 @@ class ResumeLoader:
             return records
         elif suffix == ".csv":
             df = pd.read_csv(p)
-            return df.where(pd.notnull(df), None).to_dict(orient="records")
+            records = df.where(pd.notnull(df), cast(Any, None)).to_dict(
+                orient="records"
+            )
+            return cast(list[dict[str, Any]], records)
         elif suffix in (".parquet", ".pq"):
             df = pd.read_parquet(p)
-            return df.where(pd.notnull(df), None).to_dict(orient="records")
+            records = df.where(pd.notnull(df), cast(Any, None)).to_dict(
+                orient="records"
+            )
+            return cast(list[dict[str, Any]], records)
         else:
             raise ValueError(f"Unsupported structured file format: {suffix}")
 
