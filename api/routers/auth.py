@@ -24,6 +24,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post(
     "/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED
 )
+@router.post(
+    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 def signup(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     """Register a new user account with Argon2id password hashing."""
     existing_user = db.scalar(select(User).where(User.email == user_in.email))

@@ -4,7 +4,7 @@ Strict request/response validation matching Section 28 specifications.
 """
 
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -16,7 +16,7 @@ class HealthResponse(BaseModel):
     version: str = "0.1.0"
     environment: str = "development"
     database_connected: bool = True
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # --- Auth & User Schemas ---
@@ -131,7 +131,7 @@ class RecommendationResponse(BaseModel):
     recommendations: list[RecommendationItemResponse]
     count: int
     model_version: str = "hybrid-rerank-0.4"
-    generated_at: datetime = Field(default_factory=datetime.utcnow)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # --- Feedback Schemas ---
@@ -153,3 +153,42 @@ class FeedbackResponse(BaseModel):
     action: str
     feedback_text: str | None = None
     created_at: datetime
+
+
+# --- Saved Job Schemas ---
+class SavedJobCreate(BaseModel):
+    job_id: str
+    notes: str | None = None
+
+
+class SavedJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: uuid.UUID
+    job_id: str
+    notes: str | None = None
+    created_at: datetime
+
+
+# --- User Preference Schemas ---
+class UserPreferenceUpdate(BaseModel):
+    target_role: str | None = None
+    preferred_locations: list[str] = Field(default_factory=list)
+    preferred_work_modes: list[str] = Field(default_factory=list)
+    min_salary: float | None = None
+    require_work_mode: bool = False
+    require_location: bool = False
+
+
+class UserPreferenceResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    user_id: uuid.UUID
+    target_role: str | None = None
+    preferred_locations: list[str] = Field(default_factory=list)
+    preferred_work_modes: list[str] = Field(default_factory=list)
+    min_salary: float | None = None
+    require_work_mode: bool = False
+    require_location: bool = False
+    updated_at: datetime

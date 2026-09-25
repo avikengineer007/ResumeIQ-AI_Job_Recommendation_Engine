@@ -231,3 +231,67 @@ def test_jobs_and_feedback(client: TestClient) -> None:
     res_fb_list = client.get("/api/v1/feedback", headers=headers)
     assert res_fb_list.status_code == 200
     assert len(res_fb_list.json()) >= 1
+
+
+def test_user_preferences_and_saved_jobs(client: TestClient) -> None:
+    # 1. Register user via /api/v1/auth/register alias
+    email = "prefs_user@example.com"
+    pw = "SecurePrefs2026!"
+    res_reg = client.post(
+        "/api/v1/auth/register",
+        json={"email": email, "password": pw, "full_name": "Pref Tester"},
+    )
+    assert res_reg.status_code == 201
+    assert res_reg.json()["email"] == email
+
+    res_login = client.post("/api/v1/auth/login", json={"email": email, "password": pw})
+    assert res_login.status_code == 200
+    token = res_login.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 2. Get default preferences
+    res_pref_get = client.get("/api/v1/user/preferences", headers=headers)
+    assert res_pref_get.status_code == 200
+    pref_data = res_pref_get.json()
+    assert pref_data["target_role"] is None
+    assert pref_data["preferred_work_modes"] == []
+
+    # 3. Update preferences
+    pref_update = {
+        "target_role": "Lead ML Engineer",
+        "preferred_locations": ["San Francisco, CA", "Remote"],
+        "preferred_work_modes": ["remote", "hybrid"],
+        "min_salary": 180000.0,
+        "require_work_mode": True,
+        "require_location": False,
+    }
+    res_pref_put = client.put(
+        "/api/v1/user/preferences", json=pref_update, headers=headers
+    )
+    assert res_pref_put.status_code == 200
+    updated = res_pref_put.json()
+    assert updated["target_role"] == "Lead ML Engineer"
+    assert "remote" in updated["preferred_work_modes"]
+    assert updated["require_work_mode"] is True
+
+    # 4. Save job via /api/v1/save-job
+    save_payload = {"job_id": "job_fastapi_01", "notes": "Top target opportunity"}
+    res_save = client.post("/api/v1/save-job", json=save_payload, headers=headers)
+    assert res_save.status_code == 201
+    saved_item = res_save.json()
+    assert saved_item["job_id"] == "job_fastapi_01"
+    assert saved_item["notes"] == "Top target opportunity"
+
+    # 5. List saved jobs via /api/v1/saved-jobs
+    res_saved_list = client.get("/api/v1/saved-jobs", headers=headers)
+    assert res_saved_list.status_code == 200
+    assert len(res_saved_list.json()) == 1
+    assert res_saved_list.json()[0]["job_id"] == "job_fastapi_01"
+
+    # 6. Delete saved job
+    res_del = client.delete("/api/v1/save-job/job_fastapi_01", headers=headers)
+    assert res_del.status_code == 204
+
+    # Verify deleted
+    res_saved_after = client.get("/api/v1/saved-jobs", headers=headers)
+    assert len(res_saved_after.json()) == 0

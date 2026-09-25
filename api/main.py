@@ -18,6 +18,7 @@ from api.routers import (
     jobs,
     recommendations,
     resumes,
+    users,
 )
 
 # Allowed CORS origins
@@ -63,6 +64,7 @@ app.include_router(resumes.router, prefix="/api/v1")
 app.include_router(jobs.router, prefix="/api/v1")
 app.include_router(recommendations.router, prefix="/api/v1")
 app.include_router(feedback.router, prefix="/api/v1")
+app.include_router(users.router, prefix="/api/v1")
 
 
 @app.get("/", tags=["Root"])
