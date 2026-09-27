@@ -4,14 +4,16 @@
 
 @layer base {
   :root {
-    --bg-primary: #060907;
-    --accent-gold: #d4af37;
+    --bg-primary: #F4F7FC;
+    --sidebar-bg: #0B112C;
+    --accent-blue: #3B49DF;
+    --accent-cyan: #00D2FF;
   }
 
   body {
-    background-color: #060907;
-    color: #e5e7eb;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #F4F7FC;
+    color: #1E293B;
+    font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -21,68 +23,69 @@
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d120f;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #232f27;
-  border-radius: 4px;
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #35463b;
+  background: #94A3B8;
 }
 
-/* Glassmorphism styling */
-.glass-panel {
-  background: rgba(19, 26, 21, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+/* Sidebar scrollbar */
+.sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
 }
 
-.glass-card {
-  background: rgba(22, 31, 25, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Modern Card Soft Shadow */
+.card-resumeiq {
+  background: #FFFFFF;
+  border: 1px solid #EEF2F6;
+  border-radius: 1rem;
+  box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.glass-card:hover {
-  border-color: rgba(212, 175, 55, 0.4);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px -2px rgba(212, 175, 55, 0.15);
-  transform: translateY(-2px);
+.card-resumeiq:hover {
+  border-color: #E2E8F0;
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08);
 }
 
-/* Gold gradient text */
-.text-gold-gradient {
-  background: linear-gradient(135deg, #fdfbf0 0%, #d4af37 50%, #aa8420 100%);
+/* Gradients */
+.bg-hero-pattern {
+  background: linear-gradient(108deg, #EBF2FE 0%, #EDE9FE 52%, #FCE7F3 100%);
+}
+
+.bg-sidebar-card {
+  background: linear-gradient(135deg, #182255 0%, #151838 100%);
+}
+
+.text-brand-gradient {
+  background: linear-gradient(135deg, #3B49DF 0%, #6366F1 50%, #00D2FF 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Animated gradient border */
-.gradient-border-gold {
-  position: relative;
-  background: #131a15;
-  background-clip: padding-box;
-  border: 1px solid transparent;
+.text-white-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.gradient-border-gold::before {
-  content: '';
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  z-index: -1;
-  margin: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.6), rgba(16, 185, 129, 0.2), rgba(212, 175, 55, 0.1));
-}

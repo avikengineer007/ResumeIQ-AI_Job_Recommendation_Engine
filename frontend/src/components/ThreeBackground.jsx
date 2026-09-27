@@ -43,12 +43,12 @@ export default function ThreeBackground() {
 
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    // Warm metallic gold particles
+    // Cyan & Indigo particles matching ResumeIQ AI theme
     const particleMaterial = new THREE.PointsMaterial({
-      color: 0xd4af37,
-      size: 1.8,
+      color: 0x3b82f6,
+      size: 1.5,
       transparent: true,
-      opacity: 0.75,
+      opacity: 0.35,
       blending: THREE.AdditiveBlending,
     });
 
@@ -57,9 +57,9 @@ export default function ThreeBackground() {
 
     // Connecting Lines Material
     const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0xaa8830,
+      color: 0x6366f1,
       transparent: true,
-      opacity: 0.15,
+      opacity: 0.12,
       blending: THREE.AdditiveBlending,
     });
 

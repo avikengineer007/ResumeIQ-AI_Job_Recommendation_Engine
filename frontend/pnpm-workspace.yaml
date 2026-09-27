@@ -1,0 +1,4 @@
+nodeLinker: hoisted
+packageImportMethod: copy
+onlyBuiltDependencies:
+  - esbuild

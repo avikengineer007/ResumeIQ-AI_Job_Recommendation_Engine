@@ -8,7 +8,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        darkbg: "#060907",
+        darkbg: "#0B112C",
+        sidebar: {
+          DEFAULT: "#0B112C",
+          dark: "#080D21",
+          active: "#3B49DF",
+          hover: "#151C3D",
+        },
+        brand: {
+          blue: "#3B49DF",
+          indigo: "#4F46E5",
+          cyan: "#00D2FF",
+          mint: "#10B981",
+          lightBg: "#F4F7FC",
+          card: "#FFFFFF",
+          border: "#E2E8F0",
+        },
         gold: {
           50: '#fdfbf0',
           100: '#f8f4db',
@@ -22,22 +37,24 @@ export default {
           900: '#674822',
         },
         surface: {
-          50: '#0d120f',
-          100: '#131a15',
-          200: '#1b241e',
-          300: '#232f27',
-          card: 'rgba(19, 26, 21, 0.85)',
-          border: 'rgba(212, 175, 55, 0.18)',
+          50: '#F8FAFC',
+          100: '#F1F5F9',
+          200: '#E2E8F0',
+          300: '#CBD5E1',
+          card: '#FFFFFF',
+          border: '#E2E8F0',
         }
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
         display: ['Outfit', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
-        'gold-glow': '0 0 25px -4px rgba(212, 175, 55, 0.35)',
-        'emerald-glow': '0 0 25px -4px rgba(16, 185, 129, 0.35)',
+        'brand-glow': '0 0 25px -4px rgba(59, 73, 223, 0.4)',
+        'cyan-glow': '0 0 25px -4px rgba(0, 210, 255, 0.45)',
+        'card-soft': '0 4px 20px -2px rgba(15, 23, 42, 0.05)',
+        'card-hover': '0 12px 30px -4px rgba(15, 23, 42, 0.1)',
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
