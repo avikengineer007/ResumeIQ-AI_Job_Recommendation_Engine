@@ -295,3 +295,12 @@ def test_user_preferences_and_saved_jobs(client: TestClient) -> None:
     # Verify deleted
     res_saved_after = client.get("/api/v1/saved-jobs", headers=headers)
     assert len(res_saved_after.json()) == 0
+
+
+def test_live_adzuna_jobs_endpoint(client: TestClient) -> None:
+    res = client.get("/api/v1/jobs/live/search?query=Python&limit=2")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert "jobs" in data
+    assert isinstance(data["jobs"], list)

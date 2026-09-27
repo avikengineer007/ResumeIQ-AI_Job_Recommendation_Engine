@@ -20,11 +20,36 @@ ADZUNA_COUNTRY = os.getenv("ADZUNA_COUNTRY", "in")
 
 # Common skill keywords to tag extracted jobs
 CORE_TECH_SKILLS = [
-    "Python", "Java", "C++", "JavaScript", "TypeScript", "React", "Node.js",
-    "SQL", "PostgreSQL", "MongoDB", "FastAPI", "Django", "Docker", "Kubernetes",
-    "AWS", "Azure", "GCP", "Machine Learning", "Deep Learning", "PyTorch",
-    "TensorFlow", "Scikit-Learn", "Data Analysis", "Power BI", "Tableau",
-    "DSA", "System Design", "Problem Solving", "NLP", "Computer Vision"
+    "Python",
+    "Java",
+    "C++",
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "SQL",
+    "PostgreSQL",
+    "MongoDB",
+    "FastAPI",
+    "Django",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Machine Learning",
+    "Deep Learning",
+    "PyTorch",
+    "TensorFlow",
+    "Scikit-Learn",
+    "Data Analysis",
+    "Power BI",
+    "Tableau",
+    "DSA",
+    "System Design",
+    "Problem Solving",
+    "NLP",
+    "Computer Vision",
 ]
 
 
@@ -44,12 +69,14 @@ def format_salary(salary_min: float | None, salary_max: float | None) -> str | N
     """Format salary min/max into readable INR LPA or monthly stipend."""
     if not salary_min and not salary_max:
         return "Competitive Compensation"
-    
+
     val = salary_max or salary_min
     if val:
         # If value is in INR lakhs
         if val >= 100000:
-            lpa_min = round(salary_min / 100000, 1) if salary_min else round(val / 100000, 1)
+            lpa_min = (
+                round(salary_min / 100000, 1) if salary_min else round(val / 100000, 1)
+            )
             lpa_max = round(salary_max / 100000, 1) if salary_max else lpa_min
             if lpa_min == lpa_max:
                 return f"₹ {lpa_min} LPA"
@@ -63,16 +90,16 @@ def fetch_adzuna_jobs(
     query: str = "Software Engineer",
     location: str | None = "Bangalore",
     results_per_page: int = 15,
-    page: int = 1
+    page: int = 1,
 ) -> list[dict[str, Any]]:
     """Fetch live job postings from Adzuna API.
-    
+
     Args:
         query: Target job title or skill keywords
         location: City or region filter (e.g. Bangalore, Hyderabad)
         results_per_page: Number of postings to fetch (max 50)
         page: Page number
-        
+
     Returns:
         List of normalized job dictionaries ready for frontend / database.
     """
@@ -85,7 +112,7 @@ def fetch_adzuna_jobs(
         "app_key": app_key,
         "results_per_page": min(results_per_page, 50),
         "what": query,
-        "content-type": "application/json"
+        "content-type": "application/json",
     }
     if location and location.lower() != "all" and location.lower() != "any":
         params["where"] = location
@@ -98,8 +125,8 @@ def fetch_adzuna_jobs(
             url,
             headers={
                 "User-Agent": "ResumeIQ-Career-Engine/1.0",
-                "Accept": "application/json"
-            }
+                "Accept": "application/json",
+            },
         )
         with urllib.request.urlopen(req, timeout=10) as response:
             data = json.loads(response.read().decode("utf-8"))
@@ -107,31 +134,56 @@ def fetch_adzuna_jobs(
 
             normalized_jobs = []
             for item in raw_results:
-                title = item.get("title", "").replace("<strong>", "").replace("</strong>", "").strip()
-                company_name = item.get("company", {}).get("display_name", "Leading Tech Enterprise")
-                location_display = item.get("location", {}).get("display_name", location or "India")
-                description = item.get("description", "").replace("<strong>", "").replace("</strong>", "").strip()
-                
+                title = (
+                    item.get("title", "")
+                    .replace("<strong>", "")
+                    .replace("</strong>", "")
+                    .strip()
+                )
+                company_name = item.get("company", {}).get(
+                    "display_name", "Leading Tech Enterprise"
+                )
+                location_display = item.get("location", {}).get(
+                    "display_name", location or "India"
+                )
+                description = (
+                    item.get("description", "")
+                    .replace("<strong>", "")
+                    .replace("</strong>", "")
+                    .strip()
+                )
+
                 salary_min = item.get("salary_min")
                 salary_max = item.get("salary_max")
                 salary_formatted = format_salary(salary_min, salary_max)
-                
+
                 skills = extract_skills_from_text(f"{title} {description}")
 
-                normalized_jobs.append({
-                    "id": f"adzuna-{item.get('id')}",
-                    "title": title,
-                    "company": company_name,
-                    "location": location_display,
-                    "jobType": "Full-time" if "intern" not in title.lower() else "Internship",
-                    "experience": "0–2 yrs" if "intern" in title.lower() or "junior" in title.lower() else "1–3 yrs",
-                    "salary": salary_formatted,
-                    "matchScore": 90,  # Baseline high match
-                    "tags": skills,
-                    "description": description[:300] + ("..." if len(description) > 300 else ""),
-                    "redirect_url": item.get("redirect_url", "#"),
-                    "source": "Adzuna Live Feed"
-                })
+                normalized_jobs.append(
+                    {
+                        "id": f"adzuna-{item.get('id')}",
+                        "title": title,
+                        "company": company_name,
+                        "location": location_display,
+                        "jobType": (
+                            "Full-time"
+                            if "intern" not in title.lower()
+                            else "Internship"
+                        ),
+                        "experience": (
+                            "0–2 yrs"
+                            if "intern" in title.lower() or "junior" in title.lower()
+                            else "1–3 yrs"
+                        ),
+                        "salary": salary_formatted,
+                        "matchScore": 90,  # Baseline high match
+                        "tags": skills,
+                        "description": description[:300]
+                        + ("..." if len(description) > 300 else ""),
+                        "redirect_url": item.get("redirect_url", "#"),
+                        "source": "Adzuna Live Feed",
+                    }
+                )
 
             return normalized_jobs
 

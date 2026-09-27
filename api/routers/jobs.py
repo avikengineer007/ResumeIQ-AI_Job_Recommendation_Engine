@@ -17,19 +17,20 @@ def search_live_adzuna_jobs(
     query: str = Query("Software Engineer", description="Target job title or skill"),
     location: str | None = Query("Bangalore", description="City or region"),
     limit: int = Query(15, ge=1, le=50),
-    page: int = Query(1, ge=1)
+    page: int = Query(1, ge=1),
 ) -> dict:
     """Fetch live real-time job openings from Adzuna API."""
-    jobs = fetch_adzuna_jobs(query=query, location=location, results_per_page=limit, page=page)
+    jobs = fetch_adzuna_jobs(
+        query=query, location=location, results_per_page=limit, page=page
+    )
     return {
         "success": True,
         "source": "Adzuna Live Feed",
         "count": len(jobs),
         "query": query,
         "location": location,
-        "jobs": jobs
+        "jobs": jobs,
     }
-
 
 
 @router.get("", response_model=list[JobResponse])
