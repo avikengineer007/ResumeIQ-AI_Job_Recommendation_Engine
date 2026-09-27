@@ -119,15 +119,16 @@ Python, JavaScript, React, FastAPI, SQL, Docker, Machine Learning
 
     # 9. Saved Jobs
     target_job = jobs[0]["id"]
-    r_save = requests.post(
+    res_save = requests.post(
         f"{BASE}/api/v1/save-job",
         headers=headers,
         json={"job_id": target_job, "notes": "E2E test save"},
     )
     r_saved_list = requests.get(f"{BASE}/api/v1/saved-jobs", headers=headers)
     print(
-        f"[PASS] Saved Jobs Storage: HTTP {r_saved_list.status_code} ({len(r_saved_list.json())} saved jobs in collection)"
+        f"[PASS] Saved Jobs Storage: HTTP {res_save.status_code} ({len(r_saved_list.json())} saved jobs in collection)"
     )
+
 
     # 10. Feedback Logging
     r_fb = requests.post(
