@@ -1,7 +1,8 @@
 """Comprehensive end-to-end integration and system sanity test script."""
 
-import requests
 import sys
+
+import requests
 
 BASE = "http://127.0.0.1:8000"
 FRONTEND_URL = "http://localhost:5173"
