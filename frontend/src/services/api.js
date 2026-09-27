@@ -478,12 +478,13 @@ export async function uploadResumeFile(file) {
     const headers = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(`${API_BASE_URL}/resume/upload`, {
+    const res = await fetch(`${API_BASE_URL}/resumes/upload`, {
       method: 'POST',
       headers,
       body: formData,
       signal: AbortSignal.timeout(6000)
     });
+
     if (res.ok) return await res.json();
   } catch (err) {
     // fallback

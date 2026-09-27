@@ -367,8 +367,9 @@ export default function App() {
                 <span className="font-bold text-slate-800 font-display">ResumeIQ</span>
                 <span>•</span>
                 <span>AI Job Recommendation Engine</span>
-                <span>•</span>
-                <span className="font-medium text-indigo-600">Sunrise College of Technology</span>
+                <span className="font-medium text-indigo-600">
+                  {currentUser?.college || 'Candidate Career Portal'}
+                </span>
               </div>
 
               <div className="flex items-center space-x-4 text-[11px] text-slate-400 font-mono">
