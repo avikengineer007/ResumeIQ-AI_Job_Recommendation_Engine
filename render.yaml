@@ -2,7 +2,7 @@ services:
   - type: web
     name: resumeiq-api
     runtime: docker
-    dockerfilePath: ./deployment/Dockerfile.api
+    dockerfilePath: ./Dockerfile
     dockerContext: .
     plan: free
     healthCheckPath: /api/v1/health
