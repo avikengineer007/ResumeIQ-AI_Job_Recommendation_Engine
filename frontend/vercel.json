@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://YOUR_RAILWAY_BACKEND_URL/api/:path*"
+      "destination": "https://resumeiq-api-6oc4.onrender.com/api/:path*"
     }
   ],
   "headers": [
