@@ -1,0 +1,61 @@
+services:
+  - type: web
+    name: resumeiq-api
+    runtime: docker
+    dockerfilePath: ./deployment/Dockerfile.api
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: PORT
+        value: "10000"
+      - key: HOST
+        value: "0.0.0.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: resumeiq-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRE_MINUTES
+        value: "60"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+      - key: ALLOWED_ORIGINS
+        value: https://YOUR_VERCEL_APP.vercel.app
+      - key: EMBEDDING_MODEL
+        value: sentence-transformers/all-MiniLM-L6-v2
+      - key: RERANKER_MODEL
+        value: cross-encoder/ms-marco-MiniLM-L-6-v2
+      - key: RERANK_TOP_N
+        value: "50"
+      - key: VECTOR_BACKEND
+        value: faiss
+      - key: FAISS_INDEX_PATH
+        value: data/processed/faiss_index.index
+      - key: MAX_UPLOAD_MB
+        value: "10"
+      - key: RATE_LIMIT
+        value: 60/minute
+      - key: LLM_ENABLED
+        value: "false"
+      - key: LLM_PROVIDER
+        value: none
+      - key: ADZUNA_APP_ID
+        sync: false
+      - key: ADZUNA_APP_KEY
+        sync: false
+      - key: ADZUNA_COUNTRY
+        value: in
+
+databases:
+  - name: resumeiq-db
+    plan: free
+    databaseName: jobs
+    user: app
