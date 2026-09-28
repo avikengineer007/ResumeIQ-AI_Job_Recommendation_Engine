@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 COPY configs/ /app/configs/
 COPY src/ /app/src/
 COPY api/ /app/api/
+COPY database/ /app/database/
 COPY pyproject.toml /app/
 
 EXPOSE ${PORT:-10000}
