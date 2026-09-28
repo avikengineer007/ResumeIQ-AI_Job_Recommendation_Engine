@@ -9,8 +9,8 @@ description = "A skill-aware semantic job search and recommendation system and c
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [
-    { name = "Sumouna Ghosh" },
-    { name = "Avik Ghosh" }
+    { name = "Avik Ghosh", email = "avikghosg072004@gmail.com" },
+    { name = "Sumouna Ghosh" }
 ]
 license = { text = "Apache-2.0" }
 dependencies = [
