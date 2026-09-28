@@ -13,6 +13,8 @@
 [![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
 [![Code Style](https://img.shields.io/badge/Code%20Style-Black%20%26%20Ruff-000000?logo=ruff&logoColor=white)](https://github.com/astral-sh/ruff)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Live API](https://img.shields.io/badge/API%20Live-Render-46E3B7?logo=render&logoColor=white)](https://resumeiq-api-6oc4.onrender.com/docs)
+[![Interactive Docs](https://img.shields.io/badge/OpenAPI-Swagger%20UI-85EA2D?logo=swagger&logoColor=black)](https://resumeiq-api-6oc4.onrender.com/docs)
 
 <p align="center">
   <a href="#-authors--core-research-team">Authors</a> •
@@ -145,7 +147,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 - **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Health Check**: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
 
 ---
 
@@ -201,7 +203,7 @@ Interactive OpenAPI documentation is hosted at `/docs`.
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/health` | System health check and model loading status |
+| `GET` | `/api/v1/health` | System health check and model loading status |
 | `POST`| `/api/v1/recommend/file` | Upload resume (`.pdf`, `.docx`) & receive recommendations |
 | `POST`| `/api/v1/recommend` | Submit structured candidate profile for matching |
 | `GET` | `/api/v1/jobs` | Paginated search of indexed jobs |
