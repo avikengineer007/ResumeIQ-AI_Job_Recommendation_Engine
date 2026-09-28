@@ -1,8 +1,5 @@
 {
   "framework": "vite",
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
   "rewrites": [
     {
       "source": "/api/:path*",
