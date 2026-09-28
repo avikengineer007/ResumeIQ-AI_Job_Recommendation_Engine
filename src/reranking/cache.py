@@ -36,7 +36,8 @@ class RerankCache:
 
     def _init_db(self) -> None:
         with self.conn:
-            self.conn.execute("""
+            self.conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS rerank_cache (
                     resume_hash TEXT NOT NULL,
                     job_id TEXT NOT NULL,
@@ -45,7 +46,8 @@ class RerankCache:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     PRIMARY KEY (resume_hash, job_id, model_version)
                 );
-            """)
+            """
+            )
 
     def get(
         self,
